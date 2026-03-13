@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const devopsTools = [
   {
@@ -14,6 +14,12 @@ const devopsTools = [
       { q: "Which command builds a Docker image from a Dockerfile?", options: ["docker run", "docker build", "docker create", "docker start"], answer: 1 },
       { q: "What file defines a multi-container Docker application?", options: ["Dockerfile", "docker-compose.yml", "docker.config", "container.yaml"], answer: 1 },
       { q: "Which command lists all running containers?", options: ["docker images", "docker ps", "docker ls", "docker list"], answer: 1 },
+      { q: "Which instruction sets the base image in a Dockerfile?", options: ["BASE", "FROM", "IMAGE", "SOURCE"], answer: 1 },
+      { q: "What does the EXPOSE instruction in a Dockerfile do?", options: ["Opens a port on the host", "Documents the port the container listens on", "Binds container to host port", "Starts a service"], answer: 1 },
+      { q: "Which command removes all stopped containers?", options: ["docker rm all", "docker prune", "docker container prune", "docker clean"], answer: 2 },
+      { q: "What is a Docker volume primarily used for?", options: ["Networking between containers", "Persisting data beyond container lifecycle", "Scaling containers", "Setting environment variables"], answer: 1 },
+      { q: "Which command tags a Docker image?", options: ["docker label", "docker rename", "docker tag", "docker name"], answer: 2 },
+      { q: "What does 'docker exec -it <container> bash' do?", options: ["Starts a new container", "Opens interactive shell in running container", "Copies files to container", "Logs container output"], answer: 1 },
     ]
   },
   {
@@ -26,9 +32,15 @@ const devopsTools = [
     usage: "Managing container clusters at scale, auto-healing, load balancing, rolling updates, and service discovery.",
     mcqs: [
       { q: "What is the smallest deployable unit in Kubernetes?", options: ["Container", "Pod", "Node", "Cluster"], answer: 1 },
-      { q: "Which component acts as the cluster's control plane?", options: ["kubelet", "kube-proxy", "kube-apiserver", "etcd"], answer: 2 },
+      { q: "Which component acts as the cluster's control plane API?", options: ["kubelet", "kube-proxy", "kube-apiserver", "etcd"], answer: 2 },
       { q: "What Kubernetes object manages stateless application replicas?", options: ["StatefulSet", "DaemonSet", "Deployment", "Job"], answer: 2 },
       { q: "Which command applies a configuration file to a cluster?", options: ["kubectl run", "kubectl apply", "kubectl create", "kubectl set"], answer: 1 },
+      { q: "What does a Kubernetes Service do?", options: ["Runs containers", "Stores secrets", "Exposes pods as a network service", "Schedules workloads"], answer: 2 },
+      { q: "Which object ensures one pod runs on every node?", options: ["Deployment", "ReplicaSet", "DaemonSet", "StatefulSet"], answer: 2 },
+      { q: "What stores cluster state in Kubernetes?", options: ["kubelet", "etcd", "kube-scheduler", "CoreDNS"], answer: 1 },
+      { q: "Which command scales a deployment to 5 replicas?", options: ["kubectl resize", "kubectl scale deployment my-app --replicas=5", "kubectl update replicas=5", "kubectl set replicas 5"], answer: 1 },
+      { q: "What is a Kubernetes Namespace used for?", options: ["Physical node isolation", "Logical cluster partitioning", "Container networking", "Volume management"], answer: 1 },
+      { q: "Which Kubernetes resource stores sensitive data like passwords?", options: ["ConfigMap", "Secret", "Volume", "Annotation"], answer: 1 },
     ]
   },
   {
@@ -44,6 +56,12 @@ const devopsTools = [
       { q: "Which Jenkins feature allows parallel execution?", options: ["Stage", "Step", "Parallel", "Agent"], answer: 2 },
       { q: "What is the Jenkins default port?", options: ["8080", "8443", "9090", "3000"], answer: 0 },
       { q: "Which plugin integrates Jenkins with Git?", options: ["Maven Plugin", "Git Plugin", "Pipeline Plugin", "Slack Plugin"], answer: 1 },
+      { q: "What is a Jenkins 'Stage'?", options: ["A plugin category", "A logical section of a pipeline", "A build artifact", "A test report"], answer: 1 },
+      { q: "Which directive specifies where a Jenkins pipeline runs?", options: ["stage", "steps", "agent", "environment"], answer: 2 },
+      { q: "What is the purpose of Jenkins credentials?", options: ["Storing build logs", "Securely storing secrets and passwords", "Managing plugins", "Configuring nodes"], answer: 1 },
+      { q: "What does a Jenkins 'post' block do?", options: ["Sends a POST HTTP request", "Defines actions after pipeline stages", "Posts to Slack", "Uploads artifacts"], answer: 1 },
+      { q: "Which Jenkins pipeline type uses a visual editor?", options: ["Scripted Pipeline", "Declarative Pipeline", "Blue Ocean Pipeline", "Freestyle Job"], answer: 2 },
+      { q: "What does 'SCM Polling' in Jenkins do?", options: ["Scans code for vulnerabilities", "Periodically checks VCS for changes", "Polls agents for availability", "Monitors system resources"], answer: 1 },
     ]
   },
   {
@@ -59,13 +77,19 @@ const devopsTools = [
       { q: "Which command initializes a Terraform working directory?", options: ["terraform start", "terraform init", "terraform setup", "terraform begin"], answer: 1 },
       { q: "What does 'terraform plan' do?", options: ["Applies changes", "Shows execution plan", "Destroys resources", "Validates syntax"], answer: 1 },
       { q: "Which file stores Terraform state?", options: ["main.tf", "variables.tf", "terraform.tfstate", "outputs.tf"], answer: 2 },
+      { q: "What is a Terraform provider?", options: ["A state backend", "A plugin to interact with APIs/platforms", "A variable type", "A module registry"], answer: 1 },
+      { q: "Which command applies Terraform changes?", options: ["terraform run", "terraform deploy", "terraform apply", "terraform execute"], answer: 2 },
+      { q: "What is a Terraform module?", options: ["A provider configuration", "A reusable group of resources", "A state file", "A backend type"], answer: 1 },
+      { q: "Which backend allows Terraform state to be stored remotely?", options: ["local", "S3", "Both A and B", "Neither"], answer: 1 },
+      { q: "What does 'terraform destroy' do?", options: ["Removes state file", "Deletes all managed resources", "Undoes last apply", "Resets providers"], answer: 1 },
+      { q: "What is the purpose of 'terraform.tfvars'?", options: ["Define providers", "Store variable values", "Track state", "Define outputs"], answer: 1 },
     ]
   },
   {
     id: 5,
     name: "Ansible",
     icon: "⚙️",
-    category: "Configuration Mgmt",
+    category: "Config Mgmt",
     color: "#ee0000",
     description: "Ansible is an agentless automation tool that uses YAML-based playbooks to configure systems, deploy applications, and orchestrate complex IT tasks.",
     usage: "Server configuration, application deployment, patch management, and automating repetitive IT operations.",
@@ -73,7 +97,13 @@ const devopsTools = [
       { q: "What language are Ansible playbooks written in?", options: ["Python", "JSON", "YAML", "Ruby"], answer: 2 },
       { q: "What is the Ansible inventory file used for?", options: ["Storing variables", "Defining target hosts", "Writing tasks", "Managing roles"], answer: 1 },
       { q: "Which Ansible command runs a playbook?", options: ["ansible-run", "ansible-play", "ansible-playbook", "ansible-exec"], answer: 2 },
-      { q: "Ansible operates without installing agents on remote hosts — True or False?", options: ["True", "False", "Only on Linux", "Depends on OS"], answer: 0 },
+      { q: "Ansible operates without installing agents on remote hosts?", options: ["True", "False", "Only on Linux", "Depends on OS"], answer: 0 },
+      { q: "What is an Ansible Role?", options: ["A user permission", "A reusable collection of tasks and files", "A module type", "A connection plugin"], answer: 1 },
+      { q: "Which module copies files to remote hosts in Ansible?", options: ["transfer", "copy", "sync", "push"], answer: 1 },
+      { q: "What is Ansible Galaxy used for?", options: ["Cloud provisioning", "Sharing and downloading roles", "Inventory management", "Encryption"], answer: 1 },
+      { q: "Which directive in a playbook specifies target hosts?", options: ["targets", "hosts", "nodes", "machines"], answer: 1 },
+      { q: "What does the 'become: yes' directive do in Ansible?", options: ["Enables debug mode", "Runs tasks with privilege escalation (sudo)", "Connects via SSH", "Enables dry-run"], answer: 1 },
+      { q: "Which Ansible module manages system services?", options: ["command", "shell", "service", "systemd"], answer: 2 },
     ]
   },
   {
@@ -85,10 +115,16 @@ const devopsTools = [
     description: "Git is a distributed version control system that tracks changes in source code, enabling collaboration, branching, and complete history management.",
     usage: "Source code management, team collaboration, feature branching, code reviews, and CI/CD integration.",
     mcqs: [
-      { q: "Which command creates a new Git branch?", options: ["git new", "git branch", "git checkout -b", "Both B and C"], answer: 3 },
-      { q: "What does 'git rebase' do?", options: ["Merges branches", "Moves commits to new base", "Deletes branch", "Stashes changes"], answer: 1 },
+      { q: "Which command creates and switches to a new Git branch?", options: ["git new", "git branch", "git checkout -b", "git switch --new"], answer: 2 },
+      { q: "What does 'git rebase' do?", options: ["Merges branches", "Moves commits to a new base", "Deletes a branch", "Stashes changes"], answer: 1 },
       { q: "Which file tells Git which files to ignore?", options: [".gitconfig", ".gitignore", ".gitkeep", ".gitmodules"], answer: 1 },
       { q: "What does 'git stash' do?", options: ["Deletes changes", "Temporarily saves uncommitted changes", "Commits changes", "Pushes to remote"], answer: 1 },
+      { q: "What does 'git cherry-pick' do?", options: ["Selects a repository", "Applies a specific commit to current branch", "Deletes commits", "Compares branches"], answer: 1 },
+      { q: "What is a 'detached HEAD' state in Git?", options: ["Corrupt repository", "HEAD pointing directly to a commit, not a branch", "Missing remote", "Merge conflict state"], answer: 1 },
+      { q: "Which command shows the commit history graph?", options: ["git show", "git log --oneline --graph", "git history", "git commits"], answer: 1 },
+      { q: "What does 'git fetch' do?", options: ["Downloads and merges remote changes", "Only downloads remote changes without merging", "Pushes local changes", "Clones repository"], answer: 1 },
+      { q: "What is the purpose of 'git bisect'?", options: ["Split repository", "Find the commit that introduced a bug", "Merge branches", "Archive commits"], answer: 1 },
+      { q: "Which Git workflow uses feature branches and pull requests?", options: ["Gitflow", "GitHub Flow", "Trunk-Based Development", "Centralized Workflow"], answer: 1 },
     ]
   },
   {
@@ -104,13 +140,19 @@ const devopsTools = [
       { q: "What query language does Prometheus use?", options: ["SQL", "PromQL", "NRQL", "LogQL"], answer: 1 },
       { q: "What is the default Prometheus port?", options: ["3000", "9090", "8080", "5000"], answer: 1 },
       { q: "What component handles alert routing in Prometheus?", options: ["Pushgateway", "AlertManager", "Grafana", "Node Exporter"], answer: 1 },
+      { q: "What is a Prometheus 'exporter'?", options: ["A data export tool", "An agent that exposes metrics for scraping", "An alert rule", "A dashboard plugin"], answer: 1 },
+      { q: "Which Prometheus metric type tracks a value that can go up and down?", options: ["Counter", "Gauge", "Histogram", "Summary"], answer: 1 },
+      { q: "What does Prometheus 'scrape' mean?", options: ["Delete old metrics", "Pull metrics from a target endpoint", "Push metrics to storage", "Aggregate metrics"], answer: 1 },
+      { q: "What is the purpose of a Prometheus 'recording rule'?", options: ["Record alerts", "Pre-compute expensive queries as new metrics", "Store logs", "Configure exporters"], answer: 1 },
+      { q: "Which file configures Prometheus scrape targets?", options: ["prometheus.rules", "alertmanager.yml", "prometheus.yml", "targets.conf"], answer: 2 },
+      { q: "What does the 'rate()' function do in PromQL?", options: ["Calculates total count", "Computes per-second average rate of increase", "Rounds values", "Filters time series"], answer: 1 },
     ]
   },
   {
     id: 8,
     name: "AWS",
     icon: "☁️",
-    category: "Cloud Platform",
+    category: "Cloud",
     color: "#ff9900",
     description: "Amazon Web Services is the world's leading cloud platform offering 200+ services including compute, storage, databases, networking, AI/ML, and DevOps tools.",
     usage: "Hosting applications, managing scalable infrastructure, serverless computing, storage, and cloud-native DevOps pipelines.",
@@ -119,9 +161,177 @@ const devopsTools = [
       { q: "What does AWS IAM stand for?", options: ["Internet Access Manager", "Identity and Access Management", "Internal Admin Module", "Instance Access Monitor"], answer: 1 },
       { q: "Which service provides serverless compute on AWS?", options: ["EC2", "ECS", "Lambda", "Fargate"], answer: 2 },
       { q: "What AWS service is used for object storage?", options: ["EBS", "EFS", "S3", "Glacier"], answer: 2 },
+      { q: "What is AWS VPC?", options: ["Virtual Private Cloud for isolated networking", "Virtual Processing Core", "Volume Partition Controller", "Version Pipeline Control"], answer: 0 },
+      { q: "Which AWS service provides managed Kubernetes?", options: ["ECS", "EKS", "ECR", "EMR"], answer: 1 },
+      { q: "What is AWS CloudFormation used for?", options: ["Cloud monitoring", "Infrastructure as Code provisioning", "CDN management", "Database migration"], answer: 1 },
+      { q: "Which service acts as a managed load balancer on AWS?", options: ["Route 53", "CloudFront", "Elastic Load Balancing", "API Gateway"], answer: 2 },
+      { q: "What does Amazon RDS provide?", options: ["Raw disk storage", "Managed relational database service", "NoSQL database", "Cache service"], answer: 1 },
+      { q: "What is the AWS shared responsibility model?", options: ["AWS manages everything", "AWS manages infrastructure, customer manages data/apps", "Customer manages everything", "Shared billing model"], answer: 1 },
+    ]
+  },
+  {
+    id: 9,
+    name: "Python",
+    icon: "🐍",
+    category: "Programming",
+    color: "#3776ab",
+    description: "Python is a versatile, high-level programming language known for its clean syntax and powerful ecosystem. It is widely used in DevOps, automation, data science, and web development.",
+    usage: "Scripting, automation, REST APIs, data pipelines, AI/ML workflows, infrastructure tooling, and cloud SDKs like boto3.",
+    mcqs: [
+      { q: "Which keyword is used to define a function in Python?", options: ["function", "def", "func", "define"], answer: 1 },
+      { q: "What is the output of: print(type([]))?", options: ["<class 'tuple'>", "<class 'list'>", "<class 'array'>", "<class 'set'>"], answer: 1 },
+      { q: "Which Python library is commonly used for HTTP requests?", options: ["httplib", "urllib2", "requests", "fetch"], answer: 2 },
+      { q: "What does 'pip' stand for?", options: ["Python Install Package", "Pip Installs Packages", "Package Index Protocol", "Python Index Path"], answer: 1 },
+      { q: "What is a Python decorator?", options: ["A comment style", "A function that modifies another function", "A class attribute", "A module type"], answer: 1 },
+      { q: "Which statement is used to handle exceptions in Python?", options: ["catch/throw", "try/except", "begin/rescue", "try/catch"], answer: 1 },
+      { q: "What does 'list comprehension' look like in Python?", options: ["[for x in range(5)]", "[x for x in range(5)]", "list(x for x in range(5))", "(x for x in range(5))"], answer: 1 },
+      { q: "What is the purpose of '__init__' in a Python class?", options: ["Import modules", "Initialize class instance attributes", "Define class methods", "Destroy objects"], answer: 1 },
+      { q: "Which Python module is used for working with JSON data?", options: ["pickle", "csv", "json", "yaml"], answer: 2 },
+      { q: "What does 'virtualenv' help with in Python projects?", options: ["Virtual machine management", "Isolated Python environments per project", "Remote code execution", "Package publishing"], answer: 1 },
     ]
   },
 ];
+
+// Certificate component
+function Certificate({ tool, score, total, onClose }) {
+  const date = new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 200,
+      background: "rgba(0,0,0,0.92)", backdropFilter: "blur(16px)",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      padding: 16, animation: "fadeIn 0.4s ease"
+    }}>
+      <style>{`
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        @keyframes shimmer { 0%,100% { opacity: 0.6; } 50% { opacity: 1; } }
+        @keyframes float { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes borderGlow {
+          0%,100% { box-shadow: 0 0 20px ${tool.color}66, inset 0 0 20px ${tool.color}11; }
+          50% { box-shadow: 0 0 50px ${tool.color}99, inset 0 0 30px ${tool.color}22; }
+        }
+      `}</style>
+      <div style={{
+        background: "linear-gradient(145deg, #0a0e1a 0%, #0d1b2a 40%, #1a0a2e 100%)",
+        border: `2px solid ${tool.color}`,
+        borderRadius: 24,
+        padding: "48px 52px",
+        maxWidth: 580, width: "100%",
+        textAlign: "center",
+        position: "relative",
+        animation: "borderGlow 3s ease infinite",
+        fontFamily: "'Georgia', serif",
+        overflow: "hidden"
+      }}>
+        {/* Corner decorations */}
+        {["top-left","top-right","bottom-left","bottom-right"].map((pos,i) => (
+          <div key={pos} style={{
+            position: "absolute",
+            top: pos.includes("top") ? 16 : "auto",
+            bottom: pos.includes("bottom") ? 16 : "auto",
+            left: pos.includes("left") ? 16 : "auto",
+            right: pos.includes("right") ? 16 : "auto",
+            width: 24, height: 24,
+            borderTop: pos.includes("top") ? `2px solid ${tool.color}88` : "none",
+            borderBottom: pos.includes("bottom") ? `2px solid ${tool.color}88` : "none",
+            borderLeft: pos.includes("left") ? `2px solid ${tool.color}88` : "none",
+            borderRight: pos.includes("right") ? `2px solid ${tool.color}88` : "none",
+          }}/>
+        ))}
+
+        {/* Stars */}
+        <div style={{ fontSize: 13, letterSpacing: 8, color: tool.color, marginBottom: 8, animation: "shimmer 2s ease infinite" }}>
+          ✦ ✦ ✦ ✦ ✦
+        </div>
+
+        {/* Academy name */}
+        <div style={{ fontSize: 11, letterSpacing: 4, color: "#64748b", textTransform: "uppercase", marginBottom: 20 }}>
+          PythonLife Academy
+        </div>
+
+        {/* Certificate heading */}
+        <div style={{
+          fontSize: 11, letterSpacing: 3, textTransform: "uppercase",
+          color: "#94a3b8", marginBottom: 6
+        }}>Certificate of Achievement</div>
+
+        {/* Tool icon with float */}
+        <div style={{ fontSize: 64, margin: "16px 0", animation: "float 3s ease-in-out infinite" }}>
+          {tool.icon}
+        </div>
+
+        <div style={{ fontSize: 11, color: "#64748b", letterSpacing: 2, marginBottom: 6, textTransform: "uppercase" }}>
+          This certifies that
+        </div>
+
+        <div style={{
+          fontSize: 28, fontWeight: 700,
+          background: `linear-gradient(90deg, ${tool.color}, #a78bfa, ${tool.color})`,
+          WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+          marginBottom: 8, fontFamily: "'Georgia', serif"
+        }}>Krishna's Student</div>
+
+        <div style={{ fontSize: 13, color: "#94a3b8", marginBottom: 20, lineHeight: 1.7 }}>
+          has successfully demonstrated proficiency in
+        </div>
+
+        <div style={{
+          fontSize: 26, fontWeight: 700, color: "#f1f5f9",
+          padding: "10px 28px",
+          background: `${tool.color}18`,
+          border: `1px solid ${tool.color}44`,
+          borderRadius: 12, display: "inline-block", marginBottom: 20
+        }}>
+          {tool.name}
+        </div>
+
+        {/* Score badge */}
+        <div style={{
+          display: "inline-flex", alignItems: "center", gap: 10,
+          background: "rgba(255,255,255,0.04)",
+          border: "1px solid rgba(255,255,255,0.1)",
+          borderRadius: 50, padding: "8px 24px",
+          marginBottom: 28
+        }}>
+          <span style={{ fontSize: 20, fontWeight: 800, color: tool.color }}>{score}/{total}</span>
+          <span style={{ fontSize: 13, color: "#94a3b8" }}>Questions Correct</span>
+          <span style={{ fontSize: 18 }}>{score === total ? "🏆" : "⭐"}</span>
+        </div>
+
+        {/* Decorative divider */}
+        <div style={{
+          display: "flex", alignItems: "center", gap: 12, marginBottom: 24
+        }}>
+          <div style={{ flex: 1, height: 1, background: `linear-gradient(90deg, transparent, ${tool.color}44)` }}/>
+          <span style={{ fontSize: 16, color: tool.color }}>✦</span>
+          <div style={{ flex: 1, height: 1, background: `linear-gradient(90deg, ${tool.color}44, transparent)` }}/>
+        </div>
+
+        <div style={{ fontSize: 12, color: "#475569", marginBottom: 28 }}>
+          Awarded on {date} &nbsp;|&nbsp; Trainer: Krishna &nbsp;|&nbsp; PythonLife Academy
+        </div>
+
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={onClose} style={{
+            flex: 1, padding: "13px",
+            background: `linear-gradient(135deg, ${tool.color}cc, #7c3aed)`,
+            border: "none", borderRadius: 10,
+            color: "#fff", fontSize: 13, fontWeight: 700,
+            cursor: "pointer", fontFamily: "inherit", letterSpacing: 1
+          }}>🎉 Close</button>
+          <button onClick={() => window.print()} style={{
+            flex: 1, padding: "13px",
+            background: "rgba(255,255,255,0.05)",
+            border: "1px solid rgba(255,255,255,0.12)",
+            borderRadius: 10, color: "#94a3b8",
+            fontSize: 13, cursor: "pointer", fontFamily: "inherit"
+          }}>🖨️ Print</button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function App() {
   const [activeTool, setActiveTool] = useState(null);
@@ -131,9 +341,13 @@ export default function App() {
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
   const [filter, setFilter] = useState("All");
+  const [showCert, setShowCert] = useState(false);
+  const [answers, setAnswers] = useState([]);
 
   const categories = ["All", ...new Set(devopsTools.map(t => t.category))];
   const filtered = filter === "All" ? devopsTools : devopsTools.filter(t => t.category === filter);
+
+  const PASS_MARK = 7;
 
   const openTool = (tool) => {
     setActiveTool(tool);
@@ -142,6 +356,8 @@ export default function App() {
     setSelected(null);
     setScore(0);
     setFinished(false);
+    setShowCert(false);
+    setAnswers([]);
   };
 
   const startMCQ = () => {
@@ -150,12 +366,16 @@ export default function App() {
     setSelected(null);
     setScore(0);
     setFinished(false);
+    setShowCert(false);
+    setAnswers([]);
   };
 
   const handleAnswer = (idx) => {
     if (selected !== null) return;
     setSelected(idx);
-    if (idx === activeTool.mcqs[currentQ].answer) setScore(s => s + 1);
+    const correct = idx === activeTool.mcqs[currentQ].answer;
+    if (correct) setScore(s => s + 1);
+    setAnswers(a => [...a, { q: currentQ, selected: idx, correct }]);
   };
 
   const nextQ = () => {
@@ -167,68 +387,85 @@ export default function App() {
     }
   };
 
+  const totalQ = activeTool?.mcqs?.length || 10;
+  const passed = score >= PASS_MARK;
+
   return (
     <div style={{
       minHeight: "100vh",
-      background: "#0a0e1a",
+      background: "#070b14",
       fontFamily: "'Courier New', monospace",
       color: "#e0e6f0",
       overflowX: "hidden"
     }}>
-      {/* Animated grid background */}
+      <style>{`
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+        @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes glow { 0%,100%{text-shadow:0 0 10px #00c8ff44} 50%{text-shadow:0 0 24px #00c8ffaa,0 0 48px #00c8ff44} }
+        .tool-card:hover { transform: translateY(-6px) !important; }
+        .filter-btn:hover { border-color: rgba(0,200,255,0.5) !important; color: #cbd5e1 !important; }
+        .opt-btn:hover { border-color: rgba(255,255,255,0.3) !important; background: rgba(255,255,255,0.08) !important; }
+        @media print {
+          body > *:not(#cert-container) { display: none !important; }
+          #cert-container { display: flex !important; }
+        }
+      `}</style>
+
+      {/* Grid background */}
       <div style={{
-        position: "fixed", inset: 0, zIndex: 0,
-        backgroundImage: `linear-gradient(rgba(0,200,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,200,255,0.03) 1px, transparent 1px)`,
-        backgroundSize: "40px 40px",
-        pointerEvents: "none"
+        position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none",
+        backgroundImage: `linear-gradient(rgba(0,200,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,200,255,0.025) 1px, transparent 1px)`,
+        backgroundSize: "48px 48px"
       }}/>
 
       {/* Header */}
       <header style={{
         position: "relative", zIndex: 10,
-        background: "linear-gradient(135deg, #0d1b2a 0%, #1a0a2e 100%)",
-        borderBottom: "1px solid rgba(0,200,255,0.15)",
-        padding: "0"
+        background: "linear-gradient(135deg, #0a1628 0%, #130a24 50%, #0a1628 100%)",
+        borderBottom: "1px solid rgba(0,200,255,0.12)",
+        boxShadow: "0 4px 40px rgba(0,0,0,0.5)"
       }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "28px 24px 24px" }}>
+        <div style={{ maxWidth: 1160, margin: "0 auto", padding: "28px 24px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
             <div style={{
-              width: 72, height: 72, borderRadius: "50%",
+              width: 76, height: 76, borderRadius: "50%",
               background: "linear-gradient(135deg, #00c8ff, #7c3aed)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 30, flexShrink: 0,
-              boxShadow: "0 0 24px rgba(0,200,255,0.4)"
+              fontSize: 32, flexShrink: 0,
+              boxShadow: "0 0 32px rgba(0,200,255,0.5), 0 0 64px rgba(124,58,237,0.2)"
             }}>👨‍💻</div>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
                 <h1 style={{
-                  margin: 0, fontSize: "clamp(1.4rem,4vw,2rem)",
+                  margin: 0, fontSize: "clamp(1.5rem,4vw,2.1rem)",
                   fontFamily: "'Georgia', serif",
-                  background: "linear-gradient(90deg, #00c8ff, #a78bfa)",
-                  WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent"
+                  background: "linear-gradient(90deg, #00c8ff, #a78bfa, #00c8ff)",
+                  backgroundSize: "200%",
+                  WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                  animation: "glow 3s ease infinite"
                 }}>Krishna</h1>
                 <span style={{
-                  background: "rgba(0,200,255,0.12)", border: "1px solid rgba(0,200,255,0.3)",
-                  color: "#00c8ff", padding: "2px 10px", borderRadius: 4,
-                  fontSize: 11, letterSpacing: 2, textTransform: "uppercase"
+                  background: "rgba(0,200,255,0.1)", border: "1px solid rgba(0,200,255,0.3)",
+                  color: "#00c8ff", padding: "3px 12px", borderRadius: 4,
+                  fontSize: 10, letterSpacing: 2.5, textTransform: "uppercase"
                 }}>DevOps Trainer</span>
               </div>
-              <p style={{ margin: "4px 0 0", color: "#94a3b8", fontSize: 14 }}>
+              <p style={{ margin: "6px 0 0", color: "#64748b", fontSize: 13 }}>
                 🏫 PythonLife Academy &nbsp;|&nbsp; 10+ Real-World Projects &nbsp;|&nbsp;
                 <a href="https://github.com/Milky19" target="_blank" rel="noopener noreferrer"
                   style={{ color: "#a78bfa", textDecoration: "none" }}>⭐ github/Milky19</a>
               </p>
             </div>
-            <div style={{ marginLeft: "auto", display: "flex", gap: 12, flexWrap: "wrap" }}>
-              {[["10+","Projects"],["8","Tools"],["100%","Hands-on"]].map(([n,l]) => (
+            <div style={{ marginLeft: "auto", display: "flex", gap: 10, flexWrap: "wrap" }}>
+              {[["10+","Projects"],["9","Tools"],["7/10","Pass Mark"],["100%","Hands-on"]].map(([n,l]) => (
                 <div key={l} style={{
                   textAlign: "center",
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  borderRadius: 8, padding: "10px 16px"
+                  background: "rgba(255,255,255,0.03)",
+                  border: "1px solid rgba(255,255,255,0.07)",
+                  borderRadius: 10, padding: "10px 16px"
                 }}>
-                  <div style={{ fontSize: 20, fontWeight: 700, color: "#00c8ff" }}>{n}</div>
-                  <div style={{ fontSize: 11, color: "#64748b", letterSpacing: 1 }}>{l}</div>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: "#00c8ff", fontFamily: "'Georgia',serif" }}>{n}</div>
+                  <div style={{ fontSize: 10, color: "#475569", letterSpacing: 1.5, marginTop: 2 }}>{l}</div>
                 </div>
               ))}
             </div>
@@ -236,21 +473,33 @@ export default function App() {
         </div>
       </header>
 
+      {/* Pass mark notice */}
+      <div style={{
+        position: "relative", zIndex: 10,
+        background: "linear-gradient(90deg, rgba(0,200,255,0.06), rgba(124,58,237,0.06))",
+        borderBottom: "1px solid rgba(0,200,255,0.08)",
+        textAlign: "center", padding: "10px 24px"
+      }}>
+        <span style={{ fontSize: 12, color: "#64748b", letterSpacing: 1 }}>
+          🎓 Score <span style={{ color: "#00c8ff", fontWeight: 700 }}>7 or more out of 10</span> in any tool quiz to earn your <span style={{ color: "#a78bfa" }}>Certificate of Achievement</span>
+        </span>
+      </div>
+
       {/* Filter Bar */}
       <div style={{
         position: "relative", zIndex: 10,
-        maxWidth: 1100, margin: "0 auto",
-        padding: "20px 24px 0",
+        maxWidth: 1160, margin: "0 auto",
+        padding: "22px 24px 0",
         display: "flex", gap: 8, flexWrap: "wrap"
       }}>
         {categories.map(cat => (
-          <button key={cat} onClick={() => setFilter(cat)} style={{
-            padding: "6px 16px", borderRadius: 20, border: "1px solid",
-            borderColor: filter === cat ? "#00c8ff" : "rgba(255,255,255,0.1)",
-            background: filter === cat ? "rgba(0,200,255,0.12)" : "transparent",
-            color: filter === cat ? "#00c8ff" : "#64748b",
-            fontSize: 12, cursor: "pointer", letterSpacing: 1,
-            transition: "all 0.2s"
+          <button key={cat} className="filter-btn" onClick={() => setFilter(cat)} style={{
+            padding: "7px 18px", borderRadius: 20, border: "1px solid",
+            borderColor: filter === cat ? "#00c8ff" : "rgba(255,255,255,0.08)",
+            background: filter === cat ? "rgba(0,200,255,0.1)" : "transparent",
+            color: filter === cat ? "#00c8ff" : "#475569",
+            fontSize: 11, cursor: "pointer", letterSpacing: 1.5,
+            transition: "all 0.2s", textTransform: "uppercase"
           }}>{cat}</button>
         ))}
       </div>
@@ -258,209 +507,315 @@ export default function App() {
       {/* Tools Grid */}
       <main style={{
         position: "relative", zIndex: 10,
-        maxWidth: 1100, margin: "0 auto",
+        maxWidth: 1160, margin: "0 auto",
         padding: "24px",
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+        gridTemplateColumns: "repeat(auto-fill, minmax(248px, 1fr))",
         gap: 16
       }}>
-        {filtered.map(tool => (
-          <div key={tool.id} onClick={() => openTool(tool)} style={{
-            background: "linear-gradient(135deg, rgba(13,27,42,0.9), rgba(26,10,46,0.7))",
-            border: `1px solid rgba(${tool.color.replace('#','').match(/.{2}/g).map(h=>parseInt(h,16)).join(',')},0.25)`,
-            borderRadius: 12, padding: "20px",
-            cursor: "pointer",
-            transition: "all 0.25s",
-            position: "relative", overflow: "hidden"
-          }}
-            onMouseEnter={e => {
-              e.currentTarget.style.transform = "translateY(-4px)";
-              e.currentTarget.style.boxShadow = `0 12px 32px rgba(0,0,0,0.4), 0 0 20px ${tool.color}22`;
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "none";
-            }}
-          >
-            <div style={{
-              position: "absolute", top: 0, right: 0,
-              width: 80, height: 80, borderRadius: "0 12px 0 80px",
-              background: `${tool.color}15`
-            }}/>
-            <div style={{ fontSize: 32, marginBottom: 10 }}>{tool.icon}</div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-              <h3 style={{ margin: 0, fontSize: 16, color: "#f1f5f9" }}>{tool.name}</h3>
+        {filtered.map(tool => {
+          const rgb = tool.color.replace('#','').match(/.{2}/g).map(h=>parseInt(h,16));
+          return (
+            <div key={tool.id} className="tool-card" onClick={() => openTool(tool)} style={{
+              background: `linear-gradient(145deg, rgba(10,14,26,0.95), rgba(20,10,40,0.8))`,
+              border: `1px solid rgba(${rgb.join(',')},0.2)`,
+              borderRadius: 14, padding: "22px",
+              cursor: "pointer",
+              transition: "all 0.3s cubic-bezier(0.4,0,0.2,1)",
+              position: "relative", overflow: "hidden"
+            }}>
+              {/* Glow corner */}
+              <div style={{
+                position: "absolute", top: 0, right: 0,
+                width: 90, height: 90, borderRadius: "0 14px 0 90px",
+                background: `rgba(${rgb.join(',')},0.1)`
+              }}/>
+              {/* MCQ badge */}
+              <div style={{
+                position: "absolute", top: 12, right: 12,
+                fontSize: 9, letterSpacing: 1.5, textTransform: "uppercase",
+                color: tool.color, background: `rgba(${rgb.join(',')},0.12)`,
+                padding: "3px 8px", borderRadius: 3, border: `1px solid rgba(${rgb.join(',')},0.2)`
+              }}>10 MCQs</div>
+
+              <div style={{ fontSize: 36, marginBottom: 12 }}>{tool.icon}</div>
+              <h3 style={{ margin: "0 0 6px", fontSize: 15, color: "#f1f5f9", fontWeight: 600 }}>{tool.name}</h3>
+              <span style={{
+                fontSize: 9, letterSpacing: 2, textTransform: "uppercase",
+                color: tool.color, background: `rgba(${rgb.join(',')},0.12)`,
+                padding: "2px 8px", borderRadius: 3
+              }}>{tool.category}</span>
+              <p style={{ margin: "14px 0 0", fontSize: 12, color: "#475569", lineHeight: 1.7 }}>
+                {tool.description.slice(0, 85)}...
+              </p>
+              <div style={{
+                marginTop: 16, fontSize: 11, color: "#00c8ff",
+                display: "flex", alignItems: "center", gap: 4, letterSpacing: 0.5
+              }}>Explore + Quiz →</div>
             </div>
-            <span style={{
-              fontSize: 10, letterSpacing: 1.5, textTransform: "uppercase",
-              color: tool.color, background: `${tool.color}18`,
-              padding: "2px 8px", borderRadius: 3
-            }}>{tool.category}</span>
-            <p style={{ margin: "12px 0 0", fontSize: 12, color: "#64748b", lineHeight: 1.6 }}>
-              {tool.description.slice(0, 80)}...
-            </p>
-            <div style={{
-              marginTop: 14, fontSize: 11, color: "#00c8ff",
-              display: "flex", alignItems: "center", gap: 4
-            }}>Click to explore + MCQ →</div>
-          </div>
-        ))}
+          );
+        })}
       </main>
 
       {/* Modal */}
       {activeTool && (
         <div style={{
           position: "fixed", inset: 0, zIndex: 100,
-          background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)",
+          background: "rgba(0,0,0,0.88)", backdropFilter: "blur(12px)",
           display: "flex", alignItems: "center", justifyContent: "center",
           padding: 16
         }} onClick={e => { if (e.target === e.currentTarget) setActiveTool(null); }}>
           <div style={{
-            background: "linear-gradient(135deg, #0d1b2a, #1a0a2e)",
+            background: "linear-gradient(145deg, #0a1220, #150924)",
             border: `1px solid ${activeTool.color}44`,
-            borderRadius: 16, padding: "32px",
-            width: "100%", maxWidth: 560,
-            maxHeight: "90vh", overflowY: "auto",
-            boxShadow: `0 32px 80px rgba(0,0,0,0.6), 0 0 40px ${activeTool.color}22`,
-            position: "relative"
+            borderRadius: 18, padding: "32px",
+            width: "100%", maxWidth: 580,
+            maxHeight: "92vh", overflowY: "auto",
+            boxShadow: `0 40px 100px rgba(0,0,0,0.7), 0 0 60px ${activeTool.color}18`,
+            position: "relative", animation: "slideUp 0.3s ease"
           }}>
             <button onClick={() => setActiveTool(null)} style={{
               position: "absolute", top: 16, right: 16,
-              background: "rgba(255,255,255,0.06)", border: "none",
-              color: "#94a3b8", width: 32, height: 32, borderRadius: "50%",
-              cursor: "pointer", fontSize: 16
+              background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
+              color: "#64748b", width: 34, height: 34, borderRadius: "50%",
+              cursor: "pointer", fontSize: 18, lineHeight: "34px", textAlign: "center"
             }}>×</button>
 
-            {!mcqMode ? (
+            {/* Info view */}
+            {!mcqMode && !finished && (
               <>
-                <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
-                  <span style={{ fontSize: 44 }}>{activeTool.icon}</span>
+                <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
+                  <span style={{ fontSize: 48 }}>{activeTool.icon}</span>
                   <div>
                     <h2 style={{ margin: 0, fontSize: 22, color: "#f1f5f9" }}>{activeTool.name}</h2>
-                    <span style={{
-                      fontSize: 10, letterSpacing: 2, textTransform: "uppercase",
-                      color: activeTool.color
-                    }}>{activeTool.category}</span>
+                    <span style={{ fontSize: 10, letterSpacing: 2.5, textTransform: "uppercase", color: activeTool.color }}>
+                      {activeTool.category}
+                    </span>
                   </div>
                 </div>
 
                 <div style={{
-                  background: "rgba(255,255,255,0.03)", borderRadius: 10,
-                  padding: 16, marginBottom: 14,
+                  background: "rgba(255,255,255,0.025)", borderRadius: 12,
+                  padding: 18, marginBottom: 14,
                   borderLeft: `3px solid ${activeTool.color}`
                 }}>
-                  <div style={{ fontSize: 11, color: "#64748b", letterSpacing: 1, marginBottom: 8, textTransform: "uppercase" }}>📖 Description</div>
-                  <p style={{ margin: 0, fontSize: 13, color: "#cbd5e1", lineHeight: 1.8 }}>{activeTool.description}</p>
+                  <div style={{ fontSize: 10, color: "#475569", letterSpacing: 2, marginBottom: 10, textTransform: "uppercase" }}>📖 Description</div>
+                  <p style={{ margin: 0, fontSize: 13, color: "#94a3b8", lineHeight: 1.85 }}>{activeTool.description}</p>
                 </div>
 
                 <div style={{
-                  background: "rgba(255,255,255,0.03)", borderRadius: 10,
-                  padding: 16, marginBottom: 24,
-                  borderLeft: `3px solid #a78bfa`
+                  background: "rgba(255,255,255,0.025)", borderRadius: 12,
+                  padding: 18, marginBottom: 24,
+                  borderLeft: "3px solid #a78bfa"
                 }}>
-                  <div style={{ fontSize: 11, color: "#64748b", letterSpacing: 1, marginBottom: 8, textTransform: "uppercase" }}>🛠️ Usage</div>
-                  <p style={{ margin: 0, fontSize: 13, color: "#cbd5e1", lineHeight: 1.8 }}>{activeTool.usage}</p>
+                  <div style={{ fontSize: 10, color: "#475569", letterSpacing: 2, marginBottom: 10, textTransform: "uppercase" }}>🛠️ Usage</div>
+                  <p style={{ margin: 0, fontSize: 13, color: "#94a3b8", lineHeight: 1.85 }}>{activeTool.usage}</p>
+                </div>
+
+                {/* Certificate notice */}
+                <div style={{
+                  background: "rgba(167,139,250,0.06)",
+                  border: "1px solid rgba(167,139,250,0.2)",
+                  borderRadius: 10, padding: "12px 16px", marginBottom: 20,
+                  display: "flex", alignItems: "center", gap: 12
+                }}>
+                  <span style={{ fontSize: 24 }}>🏆</span>
+                  <div>
+                    <div style={{ fontSize: 12, color: "#a78bfa", fontWeight: 600, marginBottom: 2 }}>Certificate Available!</div>
+                    <div style={{ fontSize: 11, color: "#64748b" }}>Score 7 or more out of 10 questions to earn your certificate</div>
+                  </div>
                 </div>
 
                 <button onClick={startMCQ} style={{
-                  width: "100%", padding: "14px",
-                  background: `linear-gradient(135deg, ${activeTool.color}cc, #7c3aed)`,
-                  border: "none", borderRadius: 10, color: "#fff",
+                  width: "100%", padding: "15px",
+                  background: `linear-gradient(135deg, ${activeTool.color}dd, #7c3aed)`,
+                  border: "none", borderRadius: 12, color: "#fff",
                   fontSize: 14, fontWeight: 700, cursor: "pointer",
                   letterSpacing: 1, fontFamily: "inherit",
-                  boxShadow: `0 8px 24px ${activeTool.color}44`
-                }}>🧠 Start MCQ Quiz ({activeTool.mcqs.length} Questions)</button>
+                  boxShadow: `0 10px 32px ${activeTool.color}44`,
+                  transition: "opacity 0.2s"
+                }}>🧠 Start MCQ Quiz — 10 Questions</button>
               </>
-            ) : !finished ? (
+            )}
+
+            {/* Quiz view */}
+            {mcqMode && !finished && (
               <>
                 <div style={{ marginBottom: 20 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                    <span style={{ fontSize: 13, color: "#64748b" }}>{activeTool.icon} {activeTool.name} Quiz</span>
-                    <span style={{
-                      fontSize: 11, padding: "4px 12px", borderRadius: 20,
-                      background: "rgba(0,200,255,0.1)", color: "#00c8ff", border: "1px solid rgba(0,200,255,0.2)"
-                    }}>Q {currentQ + 1} / {activeTool.mcqs.length}</span>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                    <span style={{ fontSize: 12, color: "#475569" }}>{activeTool.icon} {activeTool.name}</span>
+                    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                      <span style={{ fontSize: 11, color: "#22c55e" }}>✓ {score}</span>
+                      <span style={{
+                        fontSize: 11, padding: "4px 12px", borderRadius: 20,
+                        background: "rgba(0,200,255,0.08)", color: "#00c8ff",
+                        border: "1px solid rgba(0,200,255,0.2)"
+                      }}>Q {currentQ + 1}/{totalQ}</span>
+                    </div>
                   </div>
-                  <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 4, height: 4, marginBottom: 20 }}>
+
+                  {/* Progress bar */}
+                  <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 4, height: 5, marginBottom: 22, overflow: "hidden" }}>
                     <div style={{
                       height: "100%", borderRadius: 4,
                       background: `linear-gradient(90deg, ${activeTool.color}, #7c3aed)`,
-                      width: `${((currentQ + 1) / activeTool.mcqs.length) * 100}%`,
-                      transition: "width 0.4s"
+                      width: `${((currentQ) / totalQ) * 100}%`,
+                      transition: "width 0.4s ease"
                     }}/>
                   </div>
-                  <h3 style={{ margin: "0 0 20px", fontSize: 15, color: "#f1f5f9", lineHeight: 1.6 }}>
-                    {activeTool.mcqs[currentQ].q}
+
+                  {/* Question */}
+                  <h3 style={{
+                    margin: "0 0 22px", fontSize: 14, color: "#f1f5f9",
+                    lineHeight: 1.7, padding: "16px 18px",
+                    background: "rgba(255,255,255,0.025)", borderRadius: 10,
+                    borderLeft: `3px solid ${activeTool.color}`
+                  }}>
+                    {currentQ + 1}. {activeTool.mcqs[currentQ].q}
                   </h3>
+
+                  {/* Options */}
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                     {activeTool.mcqs[currentQ].options.map((opt, idx) => {
-                      let bg = "rgba(255,255,255,0.04)";
-                      let border = "rgba(255,255,255,0.1)";
-                      let color = "#cbd5e1";
+                      const isAnswer = idx === activeTool.mcqs[currentQ].answer;
+                      const isSelected = idx === selected;
+                      let bg = "rgba(255,255,255,0.03)";
+                      let border = "rgba(255,255,255,0.08)";
+                      let color = "#94a3b8";
+                      let prefix = "";
                       if (selected !== null) {
-                        if (idx === activeTool.mcqs[currentQ].answer) { bg = "rgba(34,197,94,0.15)"; border = "#22c55e"; color = "#22c55e"; }
-                        else if (idx === selected) { bg = "rgba(239,68,68,0.15)"; border = "#ef4444"; color = "#ef4444"; }
+                        if (isAnswer) { bg = "rgba(34,197,94,0.12)"; border = "#22c55e66"; color = "#22c55e"; prefix = "✓ "; }
+                        else if (isSelected) { bg = "rgba(239,68,68,0.12)"; border = "#ef444466"; color = "#ef4444"; prefix = "✗ "; }
                       }
                       return (
-                        <button key={idx} onClick={() => handleAnswer(idx)} style={{
+                        <button key={idx} className={selected === null ? "opt-btn" : ""}
+                          onClick={() => handleAnswer(idx)} style={{
                           background: bg, border: `1px solid ${border}`,
-                          borderRadius: 8, padding: "12px 16px", color,
+                          borderRadius: 10, padding: "13px 16px", color,
                           textAlign: "left", cursor: selected !== null ? "default" : "pointer",
                           fontSize: 13, fontFamily: "inherit", transition: "all 0.2s",
-                          display: "flex", gap: 10, alignItems: "center"
+                          display: "flex", gap: 12, alignItems: "center"
                         }}>
                           <span style={{
-                            width: 22, height: 22, borderRadius: "50%",
-                            background: "rgba(255,255,255,0.06)", border: `1px solid ${border}`,
+                            width: 26, height: 26, borderRadius: "50%", flexShrink: 0,
+                            background: "rgba(255,255,255,0.05)", border: `1px solid ${border}`,
                             display: "flex", alignItems: "center", justifyContent: "center",
-                            fontSize: 11, flexShrink: 0, color
+                            fontSize: 10, color, fontWeight: 700
                           }}>{["A","B","C","D"][idx]}</span>
-                          {opt}
+                          <span>{prefix}{opt}</span>
                         </button>
                       );
                     })}
                   </div>
                 </div>
+
                 {selected !== null && (
                   <button onClick={nextQ} style={{
-                    width: "100%", padding: "12px",
-                    background: "linear-gradient(135deg, #7c3aed, #00c8ff)",
-                    border: "none", borderRadius: 10, color: "#fff",
-                    fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit"
-                  }}>{currentQ + 1 < activeTool.mcqs.length ? "Next Question →" : "See Results 🎯"}</button>
+                    width: "100%", padding: "13px",
+                    background: "linear-gradient(135deg, #7c3aed, #00c8ff44, #7c3aed)",
+                    backgroundSize: "200%",
+                    border: "1px solid rgba(0,200,255,0.3)",
+                    borderRadius: 12, color: "#fff",
+                    fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                    letterSpacing: 0.5
+                  }}>
+                    {currentQ + 1 < totalQ ? "Next Question →" : "See Results 🎯"}
+                  </button>
                 )}
               </>
-            ) : (
-              <div style={{ textAlign: "center", padding: "20px 0" }}>
-                <div style={{ fontSize: 64, marginBottom: 16 }}>
-                  {score === activeTool.mcqs.length ? "🏆" : score >= activeTool.mcqs.length / 2 ? "🎉" : "📚"}
+            )}
+
+            {/* Results view */}
+            {finished && (
+              <div style={{ textAlign: "center", padding: "10px 0", animation: "slideUp 0.4s ease" }}>
+                <div style={{ fontSize: 72, marginBottom: 16 }}>
+                  {score === totalQ ? "🏆" : passed ? "🎉" : "📚"}
                 </div>
-                <h2 style={{ margin: "0 0 8px", fontSize: 24, color: "#f1f5f9" }}>
-                  {score}/{activeTool.mcqs.length}
+
+                {/* Score ring */}
+                <div style={{
+                  display: "inline-flex", flexDirection: "column", alignItems: "center",
+                  width: 120, height: 120, borderRadius: "50%",
+                  background: passed
+                    ? "linear-gradient(135deg, rgba(34,197,94,0.15), rgba(0,200,255,0.15))"
+                    : "rgba(255,255,255,0.04)",
+                  border: `3px solid ${passed ? "#22c55e" : "#ef4444"}`,
+                  justifyContent: "center", margin: "0 auto 20px",
+                  boxShadow: passed ? "0 0 32px rgba(34,197,94,0.3)" : "none"
+                }}>
+                  <div style={{ fontSize: 32, fontWeight: 800, color: passed ? "#22c55e" : "#ef4444" }}>{score}</div>
+                  <div style={{ fontSize: 12, color: "#64748b" }}>out of {totalQ}</div>
+                </div>
+
+                <h2 style={{ margin: "0 0 8px", fontSize: 20, color: "#f1f5f9" }}>
+                  {score === totalQ ? "Perfect Score!" : passed ? "Congratulations! You Passed! 🎓" : "Keep Practicing! 💪"}
                 </h2>
-                <p style={{ color: "#64748b", marginBottom: 24, fontSize: 14 }}>
-                  {score === activeTool.mcqs.length ? "Perfect Score! You're a pro!" : score >= activeTool.mcqs.length / 2 ? "Good job! Keep practicing." : "Keep learning with Krishna's course!"}
+                <p style={{ color: "#64748b", marginBottom: 24, fontSize: 13, lineHeight: 1.7 }}>
+                  {passed
+                    ? `You scored ${score}/10 — You've earned a certificate in ${activeTool.name}!`
+                    : `You scored ${score}/10 — You need at least 7 to earn a certificate. Keep learning with Krishna's course!`}
                 </p>
-                <div style={{ display: "flex", gap: 10 }}>
-                  <button onClick={startMCQ} style={{
-                    flex: 1, padding: "12px",
-                    background: `rgba(${activeTool.color.replace('#','').match(/.{2}/g).map(h=>parseInt(h,16)).join(',')},0.15)`,
-                    border: `1px solid ${activeTool.color}`,
-                    borderRadius: 10, color: activeTool.color,
-                    cursor: "pointer", fontFamily: "inherit", fontSize: 13
-                  }}>🔄 Retry</button>
-                  <button onClick={() => setMcqMode(false)} style={{
-                    flex: 1, padding: "12px",
-                    background: "rgba(255,255,255,0.05)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: 10, color: "#94a3b8",
-                    cursor: "pointer", fontFamily: "inherit", fontSize: 13
-                  }}>← Back to Tool</button>
+
+                {/* Answer summary */}
+                <div style={{
+                  background: "rgba(255,255,255,0.025)", borderRadius: 12,
+                  padding: 16, marginBottom: 20, textAlign: "left"
+                }}>
+                  <div style={{ fontSize: 10, color: "#475569", letterSpacing: 2, marginBottom: 10, textTransform: "uppercase" }}>Answer Summary</div>
+                  <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+                    {answers.map((a, i) => (
+                      <div key={i} style={{
+                        width: 30, height: 30, borderRadius: "50%",
+                        background: a.correct ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)",
+                        border: `1px solid ${a.correct ? "#22c55e44" : "#ef444444"}`,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: 11, color: a.correct ? "#22c55e" : "#ef4444", fontWeight: 700
+                      }}>{a.correct ? "✓" : "✗"}</div>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {passed && (
+                    <button onClick={() => setShowCert(true)} style={{
+                      width: "100%", padding: "14px",
+                      background: "linear-gradient(135deg, #22c55ecc, #00c8ffcc)",
+                      border: "none", borderRadius: 12, color: "#fff",
+                      fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                      letterSpacing: 0.5, boxShadow: "0 8px 32px rgba(34,197,94,0.3)"
+                    }}>🏆 View My Certificate</button>
+                  )}
+                  <div style={{ display: "flex", gap: 10 }}>
+                    <button onClick={startMCQ} style={{
+                      flex: 1, padding: "12px",
+                      background: `rgba(255,255,255,0.04)`,
+                      border: `1px solid ${activeTool.color}44`,
+                      borderRadius: 10, color: activeTool.color,
+                      cursor: "pointer", fontFamily: "inherit", fontSize: 13
+                    }}>🔄 Retry Quiz</button>
+                    <button onClick={() => { setFinished(false); setMcqMode(false); }} style={{
+                      flex: 1, padding: "12px",
+                      background: "rgba(255,255,255,0.03)",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      borderRadius: 10, color: "#64748b",
+                      cursor: "pointer", fontFamily: "inherit", fontSize: 13
+                    }}>← Back to Tool</button>
+                  </div>
                 </div>
               </div>
             )}
           </div>
         </div>
+      )}
+
+      {/* Certificate */}
+      {showCert && activeTool && (
+        <Certificate
+          tool={activeTool}
+          score={score}
+          total={totalQ}
+          onClose={() => setShowCert(false)}
+        />
       )}
     </div>
   );
